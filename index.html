@@ -279,7 +279,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
         import { getFirestore, collection, serverTimestamp, getDocs, doc, getDoc, query, orderBy, runTransaction, setDoc, where } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAAMf_SeR061JLxfKorrcgFROawnDPDG_w", authDomain: "topup-2ecf4.firebaseapp.com", projectId: "topup-2ecf4", storageBucket: "topup-2ecf4.appspot.com", messagingSenderId: "48541449027", appId: "1:48541449027:web:080401b897cc0748dccdf6" };
+        // --- YOUR NEW FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMzN11YHiM_F0fmzI8REv_J0nEUe8iyuM",
+            authDomain: "topup-ghor-d7575.firebaseapp.com",
+            projectId: "topup-ghor-d7575",
+            storageBucket: "topup-ghor-d7575.firebasestorage.app",
+            messagingSenderId: "37287924928",
+            appId: "1:37287924928:web:1501ff5de49033be944925"
+        };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -550,7 +559,6 @@
         gameGrid.addEventListener('click', (e) => { const card = e.target.closest('.game-card'); if(card && card.dataset.gameId) showPackagePage(card.dataset.gameId); });
         navOrderStatus.addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); showPage('order-status-page'); orderStatusResultDiv.style.display = 'none'; orderIdInput.value = ''; });
         
-        // Prevent logo click from doing anything (optional, or link to home)
         sidebarLogo.addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); showPage('homepage'); });
         mainLogo.addEventListener('click', (e) => { e.preventDefault(); showPage('homepage'); });
 
