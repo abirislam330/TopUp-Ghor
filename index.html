@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopUp Ghor - Official</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+        :root {
+            --primary-color: #7c3aed; /* Brighter Purple */
+            --secondary-color: #f43f5e; /* Rose Red */
+            --card-background: rgba(17, 24, 39, 0.7); 
+            --text-color: #f3f4f6; 
+            --sidebar-width: 280px; 
+            --success-color: #4ade80;
+            --neon-blue: #00f3ff;
+            --neon-yellow: #ffd700;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hind Siliguri', sans-serif; background: linear-gradient(135deg, #050511, #1a1a40, #120f2d); color: var(--text-color); min-height: 100vh; overflow-x: hidden; }
+        body.sidebar-open { overflow: hidden; }
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 20px 0; }
+        .page { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* --- Header Design Updated --- */
+        .main-header{padding:12px 0;position:sticky;top:0;z-index:100;background:rgba(10, 10, 20, 0.8);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,.05); box-shadow: 0 4px 30px rgba(0,0,0,0.3);}
+        .navbar{display:flex;justify-content:space-between;align-items:center}
+        
+        /* NEW LOGO STYLE */
+        .logo, #sidebar .sidebar-logo { 
+            font-family: 'Audiowide', sans-serif; 
+            font-size: 2rem; 
+            font-weight: 700; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+        
+        .logo span, #sidebar .sidebar-logo span { 
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2px 10px;
+            border-radius: 6px;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.6);
+            text-shadow: none;
+        }
+        
+        #sidebar .sidebar-logo { justify-content: center; margin-bottom: 40px; font-size: 1.8rem; }
+        
+        .menu-btn{background:0 0;border:none;cursor:pointer;padding:5px; display: flex; align-items: center; justify-content: center;}
+        .menu-btn svg{stroke: #fff; transition: all .3s ease; width:32px; height:32px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));}
+        .menu-btn:hover svg{stroke:var(--secondary-color); transform: rotate(90deg);}
+
+        .page-header{display:flex;align-items:center;margin-bottom:30px;padding-top:40px}
+        .back-btn{background:var(--card-background);border:1px solid rgba(255,255,255,.1);color:var(--text-color);padding:10px 12px;border-radius:50%;cursor:pointer;margin-right:20px;transition:background-color .3s ease}
+        .back-btn:hover{background-color:var(--primary-color)}
+        .page-title{font-size:2.2rem;font-weight:600}
+        
+        #sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100%; background: #0a0a14; z-index: 1001; transform: translateX(calc(-1 * var(--sidebar-width))); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; border-right: 1px solid rgba(255,255,255,0.1); }
+        #sidebar.open { transform: translateX(0); }
+        #sidebar .close-sidebar-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; cursor: pointer; }
+        #sidebar .close-sidebar-btn svg { stroke: var(--text-color); width: 28px; height: 28px;}
+        
+        #sidebar a { display: block; color: var(--text-color); text-decoration: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; transition: all 0.3s; border: 1px solid transparent; margin-bottom: 10px; }
+        #sidebar a:hover { background-color: rgba(124, 58, 237, 0.2); border-color: var(--primary-color); color: white; padding-left: 20px; }
+        
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; backdrop-filter: blur(3px); }
+        #overlay.show { display: block; }
+        
+        .notice-bar { width: 100%; background: linear-gradient(90deg, #0f0c29, #24243e); border-bottom: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
+        .notice-bar p { display: inline-block; padding-left: 100%; animation: scroll-notice 25s linear infinite; font-weight: 500; color: #fbbf24; font-size: 0.95rem; letter-spacing: 0.5px; }
+        @keyframes scroll-notice { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .news-slider-section { padding-top: 20px; }
+        .news-slider { width: 100%; height: 220px; overflow: hidden; border-radius: 16px; box-shadow: 0 0 20px rgba(124, 58, 237, 0.2); position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        .slider-track { width: 100%; height: 100%; cursor: grab; }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease-in-out; }
+        .slide.active { opacity: 1; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .game-section{padding:40px 0} .game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px} 
+        .game-card{background: rgba(255, 255, 255, 0.05); border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.05); box-shadow:0 4px 6px rgba(0,0,0,0.3); transition: all .3s ease; cursor:pointer; display: none; position: relative;} 
+        .game-card.visible { display: block; }
+        .game-card:hover{transform:translateY(-5px); border-color: var(--primary-color); box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);} 
+        .card-banner img{width:100%;height:120px;object-fit:cover;display:block; transition: transform 0.5s ease;} 
+        .game-card:hover .card-banner img { transform: scale(1.1); }
+        .card-content{padding:12px;text-align:center; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);} 
+        .card-content h3{font-size:1rem;font-weight:600; color: #e2e8f0; white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
+        
+        .form-container{background: #111827; border-radius:16px; padding:30px; margin-bottom:30px; max-width:700px; margin-left:auto; margin-right:auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);} 
+        .form-group{margin-bottom:20px} 
+        .form-group label{display:block; font-size:1rem; font-weight:500; margin-bottom:8px; color: #9ca3af;} 
+        .form-group input, .form-group select {width:100%; padding:14px; background: #1f2937; border:1px solid #374151; border-radius:8px; color: white; font-size:1rem; transition: border-color 0.3s;}
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); }
+        
+        .package-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px} 
+        .package-card{
+            background: rgba(31, 41, 55, 0.6);
+            border: 2px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s ease;
+            position: relative;
+            overflow: hidden;
+        } 
+        .package-card:hover{border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);} 
+        
+        /* --- Package Text Color Changed Here --- */
+        .package-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--neon-blue); /* Neon Blue Color */
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+        .package-price { 
+            font-size: 1.1rem; 
+            color: var(--neon-yellow); /* Bright Yellow Color */
+            font-weight: 700; 
+            letter-spacing: 0.5px;
+        }
+        
+        /* Selected State */
+        .package-card.selected{ 
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+            border-color: transparent; 
+            box-shadow: 0 5px 20px rgba(244, 63, 94, 0.5); 
+            transform: scale(1.02); 
+        }
+        .package-card.selected .package-name, 
+        .package-card.selected .package-price { 
+            color: #ffffff; /* Text becomes white when selected */
+            text-shadow: none;
+        }
+        
+        .payment-options{display:grid;grid-template-columns:repeat(3,1fr);gap:15px} 
+        .payment-option{background: #1f2937; border:2px solid #374151; border-radius:12px; padding:15px; text-align:center; cursor:pointer; transition: all .3s ease; height: 80px; display: flex; align-items: center; justify-content: center;} 
+        .payment-option:hover{border-color:var(--secondary-color); background: rgba(255,255,255,0.05);} 
+        .payment-option.selected{border-color:var(--primary-color);box-shadow:0 0 20px rgba(124, 58, 237, 0.3); background: rgba(124, 58, 237, 0.1);} 
+        .payment-option img{height:40px; max-width: 100%; object-fit: contain;} 
+        .payment-option input[type="radio"]{display:none}
+        
+        #payment-instruction-wrapper, #payment-details {display: none; margin-top: 25px; padding-top: 25px; border-top: 1px dashed rgba(255, 255, 255, 0.2);} 
+        .copyable-input-wrapper { display: flex; align-items: center; gap: 10px; } 
+        .copyable-input-wrapper input { cursor: text; background: #000; border-color: #4ade80; color: #4ade80; font-weight: bold; letter-spacing: 1px; text-align: center; } 
+        #copy-btn { padding: 14px 20px; background: var(--secondary-color); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; white-space: nowrap; transition: filter 0.2s; }
+        #copy-btn:hover { filter: brightness(1.1); }
+        
+        .action-btn{width:100%;padding:16px;margin-top:20px;background:linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border:none;border-radius:10px;color:#fff;font-size:1.2rem;font-weight:700;cursor:pointer;transition: all .3s ease; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);} 
+        .action-btn:hover{transform:translateY(-2px); box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);}
+        .action-btn:disabled { background: #374151; cursor: not-allowed; opacity: 0.7; box-shadow: none; transform: none; }
+        
+        footer{text-align:center;padding:30px 0;margin-top:50px;border-top:1px solid rgba(255,255,255,0.05);color:#6b7280; background: #050511;}
+
+        .category-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .category-tab-btn { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #d1d5db; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease; }
+        .category-tab-btn:hover { background-color: rgba(255,255,255,0.1); color: white; }
+        .category-tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); box-shadow: 0 0 15px rgba(124, 58, 237, 0.5); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: #1f2937; padding: 40px 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: modal-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes modal-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .modal-icon { color: var(--success-color); margin-bottom: 20px; background: rgba(74, 222, 128, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
+        .modal-icon svg { width: 40px; height: 40px; }
+        .modal-content h2 { font-size: 1.5rem; margin-bottom: 10px; color: white; }
+        .modal-content p { color: #9ca3af; margin-bottom: 25px; font-size: 1rem; line-height: 1.5; }
+        .order-id-wrapper { display: flex; align-items: center; justify-content: center; background: #111827; padding: 15px; border-radius: 10px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .order-id-text { font-weight: bold; font-size: 1.1rem; color: var(--neon-yellow); margin-right: 15px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
+        .copy-order-id-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
+        .close-modal-btn { width: 100%; padding: 15px; background: var(--primary-color); color: #fff; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease-in-out; }
+        .close-modal-btn:hover { background: #6d28d9; }
+
+        #order-status-result p { color: #d1d5db; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        #order-status-result p:last-child { border-bottom: none; }
+        
+        /* Floating Button */
+        #floating-contact-btn {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); z-index: 1000; cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        #floating-contact-btn:hover { transform: scale(1.1); }
+        #floating-contact-btn svg { width: 32px; height: 32px; fill: white; }
+    </style>
+</head>
+<body>
+    <div id="overlay"></div>
+    <aside id="sidebar">
+        <button class="close-sidebar-btn" aria-label="Close menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <!-- Sidebar Logo Updated -->
+        <a href="#" class="sidebar-logo" onclick="return false;">TopUp<span>Ghor</span></a>
+        <a href="#" id="nav-order-status">📄 Order Status</a>
+    </aside>
+
+    <header class="main-header">
+        <nav class="navbar container">
+            <!-- Main Logo Updated -->
+            <a href="#" class="logo" onclick="return false;">TopUp<span>Ghor</span></a>
+            <button class="menu-btn" aria-label="Menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="20" y2="18"></line></svg></button>
+        </nav>
+    </header>
+
+    <div class="notice-bar"><p>Loading notice...</p></div>
+
+    <main class="container">
+        <div id="homepage" class="page active">
+            <section class="news-slider-section"><div class="news-slider"><div class="slider-track" id="slider-track"></div></div></section>
+            <section class="game-section">
+                <div class="category-tabs" id="category-tabs"></div>
+                <div class="game-grid" id="game-grid"></div>
+            </section>
+        </div>
+        <div id="package-page" class="page">
+            <div class="page-header"><button id="back-to-home-from-pkg" class="back-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button><h2 id="package-game-title" class="page-title"></h2></div>
+            <div class="form-container">
+                <div id="dynamic-inputs-container"></div>
+                <div class="form-group"><label>একটি প্যাকেজ বেছে নিন</label><div id="package-grid" class="package-grid"></div></div>
+                <button id="checkout-btn" class="action-btn">অর্ডার করুন</button>
+            </div>
+        </div>
+        <div id="checkout-page" class="page">
+            <div class="page-header"><button id="back-to-packages" class="back-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button><h2 class="page-title">অর্ডার ডিটেইলস</h2></div>
+            <div class="form-container">
+                <div class="form-group"><label for="first-name">First Name</label><input type="text" id="first-name" placeholder="আপনার নামের প্রথম অংশ"></div>
+                <div class="form-group"><label for="last-name">Last Name</label><input type="text" id="last-name" placeholder="আপনার নামের শেষ অংশ"></div>
+                <div class="form-group"><label for="email">Email</label><input type="email" id="email" placeholder="আপনার ইমেইল অ্যাড্রেস"></div>
+                <div class="form-group"><label>পেমেন্ট মেথড</label><div class="payment-options"></div></div>
+                <div id="payment-instruction-wrapper">
+                    <div class="form-group"><label id="payment-instruction-label">এই নাম্বারে টাকা সেন্ড মানি করুন</label><div class="copyable-input-wrapper"><input type="text" id="payment-target-number" value="Loading..." readonly><button type="button" id="copy-btn">কপি</button></div></div>
+                </div>
+                <div id="payment-details"><div class="form-group"><label for="payment-number">আপনার পেমেন্ট নম্বর</label><input type="tel" id="payment-number" placeholder="যে নম্বর থেকে টাকা পাঠিয়েছেন"></div><div class="form-group"><label for="trx-id">ট্রানজেকশন আইডি (TrxID)</label><input type="text" id="trx-id" placeholder="পেমেন্টের ট্রানজেকশন আইডি"></div></div>
+                <button id="confirm-order-btn" class="action-btn">Confirm</button>
+            </div>
+        </div>
+        <div id="order-status-page" class="page">
+            <div class="page-header"><button id="back-to-home-from-status" class="back-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button><h2 class="page-title">Order Status</h2></div>
+            <div class="form-container">
+                <div class="form-group"><label for="order-id-input">আপনার অর্ডার আইডি দিন</label><input type="text" id="order-id-input" placeholder="এখানে অর্ডার আইডি দিন "></div>
+                <button id="check-status-btn" class="action-btn">Check Status</button>
+                <div id="order-status-result"></div>
+            </div>
+        </div>
+    </main>
+    <footer><p>© 2025 TopUp Ghor. সর্বস্বত্ব সংরক্ষিত।</p></footer>
+    <div id="order-success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+            <h2>অর্ডার সম্পন্ন হয়েছে!</h2>
+            <p>আপনার অর্ডারটি সফলভাবে জমা হয়েছে।</p>
+            <div class="order-id-wrapper"><span class="order-id-text" id="modal-order-id-text"></span><button class="copy-order-id-btn" id="copy-order-id-btn">কপি</button></div>
+            <button class="close-modal-btn" id="close-modal-btn">ঠিক আছে</button>
+        </div>
+    </div>
+
+    <a id="floating-contact-btn" href="#" target="_blank" title="Contact Us" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M20.5 3.5C22.43 5.43 23.5 7.96 23.5 10.75C23.5 16.31 19.31 20.5 13.75 20.5C13.08 20.5 12.42 20.45 11.78 20.35L6.25 22.25L8.15 16.72C6.3 15.03 5.5 12.96 5.5 10.75C5.5 5.19 9.69 1 15.25 1C17.04 1 18.83 1.5 20.5 2.5V3.5Z"/>
+        </svg>
+    </a>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        import { getFirestore, collection, serverTimestamp, getDocs, doc, getDoc, query, orderBy, runTransaction, setDoc, where } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAAMf_SeR061JLxfKorrcgFROawnDPDG_w", authDomain: "topup-2ecf4.firebaseapp.com", projectId: "topup-2ecf4", storageBucket: "topup-2ecf4.appspot.com", messagingSenderId: "48541449027", appId: "1:48541449027:web:080401b897cc0748dccdf6" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const pages = document.querySelectorAll('.page');
+        const sliderTrack = document.getElementById('slider-track');
+        const gameGrid = document.getElementById('game-grid');
+        const packageGameTitle = document.getElementById('package-game-title');
+        const packageGrid = document.getElementById('package-grid');
+        const dynamicInputsContainer = document.getElementById('dynamic-inputs-container');
+        const paymentOptionsContainer = document.querySelector('.payment-options');
+        const paymentInstructionWrapper = document.getElementById('payment-instruction-wrapper');
+        const paymentDetailsDiv = document.getElementById('payment-details');
+        const copyBtn = document.getElementById('copy-btn');
+        const paymentTargetNumberInput = document.getElementById('payment-target-number');
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const closeSidebarBtn = document.querySelector('.close-sidebar-btn');
+        const navOrderStatus = document.getElementById('nav-order-status');
+        const checkStatusBtn = document.getElementById('check-status-btn');
+        const orderIdInput = document.getElementById('order-id-input');
+        const orderStatusResultDiv = document.getElementById('order-status-result');
+        const noticeBarText = document.querySelector('.notice-bar p');
+        const categoryTabsContainer = document.getElementById('category-tabs');
+        const successModal = document.getElementById('order-success-modal');
+        const modalOrderIdText = document.getElementById('modal-order-id-text');
+        const copyOrderIdBtn = document.getElementById('copy-order-id-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const sidebarLogo = document.querySelector('#sidebar .sidebar-logo');
+        const mainLogo = document.querySelector('.main-header .logo');
+        
+        let allGamesData = [];
+        let selectedPackageInfo = null;
+        let selectedPaymentMethod = null;
+        let orderData = {};
+        let slideInterval, slides = [], currentSlide = 0, touchStartX = 0, touchEndX = 0;
+
+        function showPage(pageId) { window.scrollTo(0, 0); pages.forEach(page => page.classList.remove('active')); document.getElementById(pageId)?.classList.add('active'); }
+        function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); document.body.classList.add('sidebar-open'); }
+        function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); document.body.classList.remove('sidebar-open'); }
+        function showSlide(index) { if (slides.length === 0) return; slides.forEach(slide => slide.classList.remove('active')); currentSlide = index; slides[currentSlide].classList.add('active'); }
+        function startSlideshow() { if (slides.length <= 1) return; clearInterval(slideInterval); slideInterval = setInterval(() => { showSlide((currentSlide + 1) % slides.length); }, 5000); }
+        function handleSwipe() { const swipeThreshold = 50; if (touchStartX - touchEndX > swipeThreshold) { showSlide((currentSlide + 1) % slides.length); startSlideshow(); } else if (touchEndX - startStartX > swipeThreshold) { showSlide((currentSlide - 1 + slides.length) % slides.length); startSlideshow(); } }
+        async function loadNotice() { try { const noticeDocRef = doc(db, "settings", "notice"); const noticeDocSnap = await getDoc(noticeDocRef); noticeBarText.textContent = (noticeDocSnap.exists() && noticeDocSnap.data().text) ? noticeDocSnap.data().text : "আমাদের ওয়েবসাইটে আপনাকে স্বাগতম!"; } catch (error) { console.error("Error loading notice:", error); noticeBarText.textContent = "নোটিশ লোড করা সম্ভব হয়নি।"; } }
+
+        function renderGames(gamesToRender) {
+            gameGrid.innerHTML = '';
+            if (gamesToRender.length === 0) {
+                gameGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; font-size: 1.2rem;">এই ক্যাটাগরিতে কোনো আইটেম পাওয়া যায়নি।</p>`;
+                return;
+            }
+            
+            gamesToRender.forEach(game => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card visible';
+                gameCard.dataset.gameId = game.id;
+                gameCard.innerHTML = `<div class="card-banner"><img src="${game.imageUrl}" alt="${game.name}"></div><div class="card-content"><h3>${game.name}</h3></div>`;
+                gameGrid.appendChild(gameCard);
+            });
+        }
+        
+        function filterGamesByCategory(categoryId) {
+            const filteredGames = allGamesData.filter(game => game.categoryId === categoryId);
+            renderGames(filteredGames);
+        }
+        
+        async function loadAndCacheAllGames() {
+            gameGrid.innerHTML = '<h4 style="grid-column: 1 / -1; text-align: center;">Loading Items...</h4>';
+            try {
+                const gamesQuery = query(collection(db, "games"), orderBy("serial"));
+                const gameSnapshot = await getDocs(gamesQuery);
+                allGamesData = [];
+                gameSnapshot.forEach((doc) => {
+                    allGamesData.push({ id: doc.id, ...doc.data() });
+                });
+            } catch (error) {
+                console.error("Error loading games:", error);
+                gameGrid.innerHTML = `<p>আইটেম লোড করা সম্ভব হয়নি।</p>`;
+            }
+        }
+
+        async function loadCategoriesAndInitialFilter() {
+            categoryTabsContainer.innerHTML = '<h4>Loading Categories...</h4>';
+            try {
+                const categorySnapshot = await getDocs(query(collection(db, "categories"), orderBy("serial")));
+                categoryTabsContainer.innerHTML = ''; 
+                if (categorySnapshot.empty) {
+                    categoryTabsContainer.innerHTML = 'No categories found.';
+                    gameGrid.innerHTML = '';
+                    return;
+                }
+                let isFirst = true;
+                let firstCategoryId = null;
+
+                categorySnapshot.forEach(doc => {
+                    const category = doc.data();
+                    const button = document.createElement('button');
+                    button.className = 'category-tab-btn';
+                    button.textContent = category.name;
+                    button.dataset.categoryId = doc.id;
+                    if (isFirst) {
+                        button.classList.add('active');
+                        firstCategoryId = doc.id;
+                        isFirst = false;
+                    }
+                    categoryTabsContainer.appendChild(button);
+                });
+
+                if (firstCategoryId) {
+                    filterGamesByCategory(firstCategoryId);
+                }
+            } catch (error) {
+                console.error("Error loading categories:", error);
+                categoryTabsContainer.innerHTML = '<p>ক্যাটাগরি লোড করা সম্ভব হয়নি।</p>';
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const settingsDoc = await getDoc(doc(db, "settings", "paymentNumbers"));
+                if (settingsDoc.exists()) {
+                    const paymentMethods = settingsDoc.data();
+                    paymentOptionsContainer.innerHTML = '';
+                    Object.keys(paymentMethods).forEach(key => {
+                        const method = paymentMethods[key];
+                        if (method.number && method.imageUrl) {
+                             const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+                             const optionHTML = `<label class="payment-option" data-method="${key.toLowerCase()}"><input type="radio" name="payment-method" value="${displayName}"><img src="${method.imageUrl}" alt="${displayName}"></label>`;
+                             paymentOptionsContainer.innerHTML += optionHTML;
+                        }
+                    });
+                }
+            } catch (error) { console.error("Error loading settings:", error); }
+        }
+
+        async function loadContactLink() {
+            const contactBtn = document.getElementById('floating-contact-btn');
+            try {
+                const docSnap = await getDoc(doc(db, "settings", "contactLinks"));
+                if (docSnap.exists() && docSnap.data().whatsappLink) {
+                    const link = docSnap.data().whatsappLink;
+                    if (link) {
+                        contactBtn.href = link;
+                        contactBtn.style.display = 'flex';
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading contact link:", error);
+            }
+        }
+
+        async function initializeHomepage() {
+            try {
+                const bannerSnapshot = await getDocs(query(collection(db, "banners"), orderBy("createdAt", "desc")));
+                sliderTrack.innerHTML = ''; slides = [];
+                bannerSnapshot.forEach(doc => {
+                    const banner = doc.data(); const slideEl = document.createElement('div'); slideEl.className = 'slide'; slideEl.innerHTML = `<img src="${banner.imageUrl}" alt="News Banner">`; sliderTrack.appendChild(slideEl);
+                });
+                slides = document.querySelectorAll('#slider-track .slide');
+                if(slides.length > 0) { showSlide(0); startSlideshow(); }
+            } catch (error) { console.error("Error loading banners:", error); }
+            await loadAndCacheAllGames();
+            await loadCategoriesAndInitialFilter();
+        }
+
+        async function showPackagePage(gameId) {
+            packageGameTitle.textContent = "Loading..."; dynamicInputsContainer.innerHTML = ''; showPage('package-page');
+            try {
+                const gameDoc = await getDoc(doc(db, "games", gameId)); if (!gameDoc.exists()) { packageGameTitle.textContent = "Game not found"; return; }
+                const gameData = gameDoc.data(); orderData.game = gameData.name; packageGameTitle.textContent = `${gameData.name} Packages`;
+                if (gameData.versions && gameData.versions.length > 0) { let versionHtml = `<div class="form-group"><label for="game-version">ভার্সন বেছে নিন</label><select id="game-version" required>`; gameData.versions.forEach(version => { versionHtml += `<option value="${version}">${version}</option>`; }); versionHtml += `</select></div>`; dynamicInputsContainer.innerHTML += versionHtml; }
+                switch (gameData.loginType) {
+                    case 'gmail': dynamicInputsContainer.innerHTML += `<div class="form-group"><label for="login-email">আপনার গেমের ইমেইল দিন</label><input type="email" id="login-email" placeholder="এখানে ইমেইল লিখুন" required></div>`; break;
+                    case 'playerId': default: dynamicInputsContainer.innerHTML += `<div class="form-group"><label for="player-id">আপনার প্লেয়ার আইডি দিন</label><input type="text" id="player-id" placeholder="এখানে আইডি লিখুন" required></div>`; break;
+                }
+                if (gameData.passwordField === 'required') { dynamicInputsContainer.innerHTML += `<div class="form-group"><label for="login-password">পাসওয়ার্ড দিন</label><input type="password" id="login-password" placeholder="এখানে পাসওয়ার্ড লিখুন" required></div>`; }
+
+                const packagesSnapshot = await getDocs(query(collection(db, "games", gameId, "packages"), orderBy("serial")));
+                packageGrid.innerHTML = ''; selectedPackageInfo = null; document.getElementById('checkout-btn').disabled = true;
+                packagesSnapshot.forEach((pkgDoc) => {
+                    const pkg = pkgDoc.data(); const card = document.createElement('div'); card.className = 'package-card';
+                    card.innerHTML = `<div class="package-name">${pkg.name}</div><div class="package-price">${pkg.price} BDT</div>`;
+                    card.addEventListener('click', () => { packageGrid.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected')); card.classList.add('selected'); selectedPackageInfo = { ...pkg, id: pkgDoc.id }; document.getElementById('checkout-btn').disabled = false; });
+                    packageGrid.appendChild(card);
+                });
+            } catch (error) { console.error("Error loading packages:", error); packageGameTitle.textContent = "Failed to load"; }
+        }
+
+        function initializeDraggableButton() {
+            const button = document.getElementById('floating-contact-btn');
+            let isDragging = false, hasMoved = false, startX, startY, initialX, initialY;
+            function onDragStart(e) {
+                hasMoved = false; isDragging = true; button.classList.add('grabbing');
+                const event = e.type === 'touchstart' ? e.touches[0] : e;
+                startX = event.clientX; startY = event.clientY;
+                initialX = button.offsetLeft; initialY = button.offsetTop;
+                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('mouseup', onDragEnd);
+                document.addEventListener('touchmove', onDragMove, { passive: false });
+                document.addEventListener('touchend', onDragEnd);
+            }
+            function onDragMove(e) {
+                if (!isDragging) return; e.preventDefault();
+                const moveEvent = e.type === 'touchmove' ? e.touches[0] : e;
+                if (!hasMoved && (Math.abs(moveEvent.clientX - startX) > 5 || Math.abs(moveEvent.clientY - startY) > 5)) { hasMoved = true; }
+                let newX = initialX + (moveEvent.clientX - startX);
+                let newY = initialY + (moveEvent.clientY - startY);
+                newX = Math.max(0, Math.min(newX, window.innerWidth - button.offsetWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - button.offsetHeight));
+                button.style.left = `${newX}px`; button.style.top = `${newY}px`;
+                button.style.right = 'auto'; button.style.bottom = 'auto';
+            }
+            function onDragEnd() {
+                isDragging = false; button.classList.remove('grabbing');
+                document.removeEventListener('mousemove', onDragMove);
+                document.removeEventListener('mouseup', onDragEnd);
+                document.removeEventListener('touchmove', onDragMove);
+                document.removeEventListener('touchend', onDragEnd);
+            }
+            button.addEventListener('mousedown', onDragStart);
+            button.addEventListener('touchstart', onDragStart, { passive: true });
+            button.addEventListener('click', (e) => { if (hasMoved) { e.preventDefault(); } });
+        }
+        
+        function fallbackCopyTextToClipboard(text, buttonElement, originalText) {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = text;
+            tempTextArea.style.position = "fixed";
+            document.body.appendChild(tempTextArea);
+            tempTextArea.focus();
+            tempTextArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    buttonElement.textContent = 'কপি হয়েছে!';
+                    setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
+                }
+            } catch (err) {
+                console.error('Fallback: Unable to copy', err);
+                alert('দুঃখিত, কপি করা সম্ভব হয়নি।');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        function copyTextToClipboard(text, buttonElement, originalText) {
+            if (!navigator.clipboard) {
+                fallbackCopyTextToClipboard(text, buttonElement, originalText);
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                buttonElement.textContent = 'কপি হয়েছে!';
+                setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
+            }).catch(err => {
+                console.error('Async: Could not copy text: ', err);
+                fallbackCopyTextToClipboard(text, buttonElement, originalText);
+            });
+        }
+        
+        sliderTrack.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+        sliderTrack.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); });
+        menuBtn.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        document.getElementById('back-to-home-from-pkg').addEventListener('click', () => showPage('homepage'));
+        document.getElementById('back-to-home-from-status').addEventListener('click', () => showPage('homepage'));
+        document.getElementById('back-to-packages').addEventListener('click', () => showPage('package-page'));
+        gameGrid.addEventListener('click', (e) => { const card = e.target.closest('.game-card'); if(card && card.dataset.gameId) showPackagePage(card.dataset.gameId); });
+        navOrderStatus.addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); showPage('order-status-page'); orderStatusResultDiv.style.display = 'none'; orderIdInput.value = ''; });
+        
+        // Prevent logo click from doing anything (optional, or link to home)
+        sidebarLogo.addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); showPage('homepage'); });
+        mainLogo.addEventListener('click', (e) => { e.preventDefault(); showPage('homepage'); });
+
+        categoryTabsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('category-tab-btn')) {
+                document.querySelectorAll('.category-tab-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                filterGamesByCategory(e.target.dataset.categoryId);
+            }
+        });
+        paymentOptionsContainer.addEventListener('click', async (e) => {
+            const option = e.target.closest('.payment-option'); if (!option) return;
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected')); option.classList.add('selected');
+            selectedPaymentMethod = option.querySelector('input').value;
+            try { 
+                const settingsDoc = await getDoc(doc(db, "settings", "paymentNumbers")); 
+                if (settingsDoc.exists()) { 
+                    const data = settingsDoc.data(); const methodData = data[selectedPaymentMethod.toLowerCase()];
+                    paymentTargetNumberInput.value = methodData ? methodData.number : 'N/A';
+                } 
+            } catch(err) { paymentTargetNumberInput.value = 'Failed to load'; }
+            paymentInstructionWrapper.style.display = 'block'; paymentDetailsDiv.style.display = 'block';
+        });
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            orderData.loginInfo = {}; let allValid = true;
+            const versionSelect = document.getElementById('game-version'); if (versionSelect) orderData.gameVersion = versionSelect.value;
+            const playerIdInput = document.getElementById('player-id'); const loginEmailInput = document.getElementById('login-email');
+            if (playerIdInput) { if (!playerIdInput.value.trim()) { alert('দয়া করে আপনার প্লেয়ার আইডি দিন।'); allValid = false; return; } orderData.loginInfo.playerId = playerIdInput.value.trim(); }
+            else if (loginEmailInput) { if (!loginEmailInput.value.trim()) { alert('দয়া করে আপনার ইমেইল দিন।'); allValid = false; return; } orderData.loginInfo.email = loginEmailInput.value.trim(); }
+            const loginPasswordInput = document.getElementById('login-password');
+            if (loginPasswordInput) { if (!loginPasswordInput.value.trim()) { alert('দয়া করে পাসওয়ার্ড দিন।'); allValid = false; return; } orderData.loginInfo.password = loginPasswordInput.value.trim(); }
+            if (!selectedPackageInfo) { alert('দয়া করে একটি প্যাকেজ বেছে নিন।'); allValid = false; return; }
+            if (allValid) { document.getElementById('payment-instruction-label').textContent = `${selectedPackageInfo.price}৳ টাকা এই নাম্বারে সেন্ড মানি করুন`; showPage('checkout-page'); }
+        });
+        checkStatusBtn.addEventListener('click', async () => {
+            const orderId = orderIdInput.value.trim(); if (!orderId) { alert("Please enter your Order ID."); return; }
+            orderStatusResultDiv.style.display = 'block'; orderStatusResultDiv.innerHTML = `<p>Loading...</p>`;
+            try {
+                const orderDocRef = doc(db, "orders", orderId); const orderDocSnap = await getDoc(orderDocRef);
+                if (orderDocSnap.exists()) { const order = orderDocSnap.data(); const statusClass = `status-${order.status.toLowerCase()}`; let loginDetails = order.loginInfo.playerId ? `<strong>Player ID:</strong> <span>${order.loginInfo.playerId}</span>` : `<strong>Email:</strong> <span>${order.loginInfo.email}</span>`; orderStatusResultDiv.innerHTML = `<p>${loginDetails}</p><p><strong>Game:</strong> <span>${order.game} ${order.gameVersion || ''}</span></p><p><strong>Package:</strong> <span>${order.packageName}</span></p><p><strong>Status:</strong> <span class="${statusClass}">${order.status}</span></p>`; }
+                else { orderStatusResultDiv.innerHTML = `<p style="color: var(--danger-accent);">Order not found.</p>`; }
+            } catch (error) { console.error("Error fetching order status:", error); orderStatusResultDiv.innerHTML = `<p style="color: var(--danger-accent);">An error occurred.</p>`; }
+        });
+        copyBtn.addEventListener('click', () => {
+            copyTextToClipboard(paymentTargetNumberInput.value, copyBtn, 'কপি');
+        });
+        document.getElementById('confirm-order-btn').addEventListener('click', async () => {
+            const personalInfo = { firstName: document.getElementById('first-name').value.trim(), lastName: document.getElementById('last-name').value.trim(), email: document.getElementById('email').value.trim() };
+            const paymentInfo = { number: document.getElementById('payment-number').value.trim(), trxId: document.getElementById('trx-id').value.trim() };
+            if (!personalInfo.firstName || !personalInfo.email || !selectedPaymentMethod || !paymentInfo.number || !paymentInfo.trxId) { alert("Please fill all required fields."); return; }
+            const newOrderData = { ...orderData, packageName: selectedPackageInfo.name, price: selectedPackageInfo.price, customerName: `${personalInfo.firstName} ${personalInfo.lastName}`, customerEmail: personalInfo.email, paymentMethod: selectedPaymentMethod, paymentNumber: paymentInfo.number, transactionId: paymentInfo.trxId, status: 'Pending', orderDate: serverTimestamp() };
+            const confirmBtn = document.getElementById('confirm-order-btn'); confirmBtn.disabled = true; confirmBtn.textContent = 'Processing...';
+            try {
+                const counterRef = doc(db, "counters", "orderCounter");
+                const newOrderId = await runTransaction(db, async (transaction) => {
+                    const counterDoc = await getDoc(counterRef); if (!counterDoc.exists()) throw "Counter document not found!"; const newId = (counterDoc.data().lastId || 1000) + 1; transaction.update(counterRef, { lastId: newId }); const newOrderRef = doc(db, "orders", String(newId)); transaction.set(newOrderRef, newOrderData); return newId;
+                });
+                modalOrderIdText.textContent = `Order ID: ${newOrderId}`; successModal.classList.add('show');
+            } catch (e) { console.error("Transaction failed: ", e); alert("দুঃখিত, একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
+            } finally { confirmBtn.disabled = false; confirmBtn.textContent = 'Confirm'; }
+        });
+        copyOrderIdBtn.addEventListener('click', () => {
+            const orderIdToCopy = modalOrderIdText.textContent.replace('Order ID: ', '');
+            copyTextToClipboard(orderIdToCopy, copyOrderIdBtn, 'কপি করুন');
+        });
+        closeModalBtn.addEventListener('click', () => {
+            successModal.classList.remove('show');
+            document.getElementById('checkout-page').querySelectorAll('input').forEach(input => input.value = '');
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+            paymentInstructionWrapper.style.display = 'none'; paymentDetailsDiv.style.display = 'none';
+            showPage('homepage');
+        });
+
+        // --- Initial Load ---
+        initializeHomepage();
+        loadSettings();
+        loadNotice();
+        loadContactLink();
+        initializeDraggableButton();
+        showPage('homepage');
+    </script>
+</body>
+</html>
